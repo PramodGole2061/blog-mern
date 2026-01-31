@@ -9,8 +9,8 @@ export default function Header() {
   return (
     // border-b-amber-500 is not working, it should give bottom border with amber color
     <Navbar className="p-4 border-b-amber-500">
-        <Link className="self-center text-sm sm:text-xl whitespace-nowrap font-semibold dark:text-white">
-            <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-lg">
+        <Link to='/' className="self-center text-sm sm:text-xl whitespace-nowrap font-semibold dark:text-white">
+            <span className="px-2 py-1 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-lg">
                 Pramod's
             </span>
             Blog
@@ -30,7 +30,7 @@ export default function Header() {
                 <AiOutlineMoon />
             </Button>
             <Link to='/signin' >
-                <Button className="bg-gradient-to-r from-purple-500 to-blue-500">
+                <Button className="bg-linear-to-r from-purple-500 to-blue-5000" outline>
                     Sign In
                 </Button>
             </Link>
@@ -38,9 +38,9 @@ export default function Header() {
         </div>
         <NavbarCollapse>
             {/* use the above urlPath to decide which NavbarLink to be active depending on the url path */}
-            <NavbarLink href="/" active={urlPath === '/'}>Home</NavbarLink>
-            <NavbarLink href="/about" active={urlPath === '/about'}>About</NavbarLink>
-            <NavbarLink href="/projects" active={urlPath==='/projects'}>Projects</NavbarLink>
+            <NavbarLink to="/" active={urlPath === '/'} as={Link}>Home</NavbarLink>
+            <NavbarLink to="/about" active={urlPath === '/about'} as={Link}>About</NavbarLink>
+            <NavbarLink to="/projects" active={urlPath==='/projects'} as={Link}>Projects</NavbarLink>
 
         </NavbarCollapse>
     </Navbar>

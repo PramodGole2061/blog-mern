@@ -1,0 +1,25 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon api/index.js",
+    "start": "node api/index.js" 
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PramodGole2061/blog-mern.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/PramodGole2061/blog-mern/issues"
+  },
+  "homepage": "https://github.com/PramodGole2061/blog-mern#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
