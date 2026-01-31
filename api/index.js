@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 import dbConnection from './config/dbConnection.js';
 import userRoutes from './routes/userRoutes.js';
@@ -12,10 +13,13 @@ dotenv.config();
 
 const app = express();
 
+//remove cors erors
+app.use(cors());
+
 //connect to db
 dbConnection().then(()=>{
-    app.listen(3000, ()=>{
-        console.log("Server is running on port 3000");
+    app.listen(process.env.PORT, ()=>{
+        console.log("Server is running on port ", process.env.PORT);
     });
 }).catch((error)=>{
     console.error("Failed to start server due to DB connection error", error);

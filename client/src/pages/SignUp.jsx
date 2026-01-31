@@ -1,7 +1,61 @@
-import {Link} from 'react-router-dom';
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import {Link, useNavigate} from 'react-router-dom';
+import { Alert, Button, Checkbox, Label, Spinner, TextInput } from "flowbite-react";
+import { useState } from 'react';
 
 export default function SignUp() {
+  const [formData, setFormData] = useState({});
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleChange = (e) =>{
+    setFormData({...formData, [e.target.id] : e.target.value.trim()}); //spread operator to copy existing formData and update the specific fields with new values
+  }
+
+  // console.log(formData);
+
+  
+  const handleSubmit = async (e)=>{
+    setErrorMessage(null); //reset error message on new submit
+    setLoading(true); //after clicking submit button, set loading to true
+
+    e.preventDefault(); //prevent default behavior, which is refreshing the page with submit
+    
+    //basic validation but it must me inside handleSubmit because these fields are initially epmty
+    if(!formData.name || !formData.email || !formData.password){
+      setErrorMessage("All fields need to be filled.");
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          "content-type": 'application/json'
+        },
+        body: JSON.stringify(formData) //convert formData object to JSON string
+      })
+      
+      
+      // Safe to parse JSON for successful responses
+      const data = await res.json(); //convert res json object to js object
+      
+      //we can't do !data.ok because it will always return from this if check even if it was successful
+      if(data.ok === false){
+        return setErrorMessage(data.message);
+      }
+
+      //if successfull, redirect to signin page
+      navigate('/signin')
+
+    } catch (error) {
+      setErrorMessage("An error occurred during sign up.", error)
+      setLoading(false);
+    }finally{
+      setLoading(false);
+    }
+  }
   return (
     <div className='min-h-screen min-w-screen mt-20'>
 
@@ -24,36 +78,45 @@ export default function SignUp() {
         {/* right side */}
         {/* flex-1 on right side div means 50% do right div */}
         <div className='flex-1'>
-          <form className="flex max-w-md flex-col gap-4">
+          <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="name">Your name</Label>
               </div>
-              <TextInput id="name" type="text" placeholder="username" required />
+              <TextInput id="name" type="text" placeholder="username" required onChange={handleChange} />
             </div>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="email1">Your email</Label>
+                <Label htmlFor="email">Your email</Label>
               </div>
-              <TextInput id="email1" type="email" placeholder="name@gmail.com" required />
+              <TextInput id="email" type="email" placeholder="name@gmail.com" required onChange={handleChange} />
             </div>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="password1">Your password</Label>
+                <Label htmlFor="password">Your password</Label>
               </div>
-              <TextInput id="password1" type="password" placeholder='password' required />
+              <TextInput id="password" type="password" placeholder='password' required onChange={handleChange}/>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox id="remember" />
               <Label htmlFor="remember">Remember me</Label>
             </div>
-            <Button className='bg-linear-to-r from-purple-500 to-pink-500' type="submit">Sign Up</Button>
+            <Button className='bg-linear-to-r from-purple-500 to-pink-500' type="submit" disabled={loading}>
+              {!loading ? 'Sign Up': (
+                <>
+                  <Spinner size='sm' />
+                  <span className='pl-3'>Signing Up...</span>
+                </>
+              )}
+              </Button>
             <div className='text-sm flex gap-2'>
               <span>Already have an account?</span>
               <Link to='/signin' className='text-blue-500'>
                 sign in
               </Link>
             </div>
+
+            {errorMessage && (<Alert className='mt-5 text-sm' color='failure'>{errorMessage}</Alert>)}
           </form>
         </div>
 
