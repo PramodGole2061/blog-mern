@@ -1,11 +1,18 @@
 import {Link, useNavigate} from 'react-router-dom';
 import { Alert, Button, Checkbox, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
+
+import { signInStart, signInSuccess, signInFailure, finallyBlock } from '../redux/user/userSlice.js';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
+
+  //it can be used to update global states
+  const dispatch = useDispatch();
+
+  //used to access global states
+  const {loading, error} = useSelector((state) =>(state.user))
 
   const navigate = useNavigate();
 
@@ -17,14 +24,13 @@ export default function SignUp() {
 
   
   const handleSubmit = async (e)=>{
-    setErrorMessage(null); //reset error message on new submit
-    setLoading(true); //after clicking submit button, set loading to true
+    dispatch(signInStart()) //global function from userSlice.js
 
     e.preventDefault(); //prevent default behavior, which is refreshing the page with submit
     
     //basic validation but it must me inside handleSubmit because these fields are initially epmty
     if(!formData.name || !formData.email || !formData.password){
-      setErrorMessage("All fields need to be filled.");
+      dispatch(signInFailure("All fields need to be filled."))
       return;
     }
 
@@ -42,18 +48,20 @@ export default function SignUp() {
       const data = await res.json(); //convert res json object to js object
       
       //we can't do !data.ok because it will always return from this if check even if it was successful
-      if(data.ok === false){
-        return setErrorMessage(data.message);
+      if(!res.ok){
+        return dispatch(signInFailure(data.message));
       }
 
       //if successfull, redirect to signin page
-      navigate('/signin')
+      if(res.ok){
+        dispatch(signInSuccess(data)) //signInSuccess(state, action) so it requires a payload/action
+        navigate('/signin')
+      }
 
     } catch (error) {
-      setErrorMessage("An error occurred during sign up.", error)
-      setLoading(false);
+      return dispatch(signInFailure(error.message));
     }finally{
-      setLoading(false);
+      dispatch(finallyBlock())
     }
   }
   return (
@@ -97,10 +105,6 @@ export default function SignUp() {
               </div>
               <TextInput id="password" type="password" placeholder='password' required onChange={handleChange}/>
             </div>
-            <div className="flex items-center gap-2">
-              <Checkbox id="remember" />
-              <Label htmlFor="remember">Remember me</Label>
-            </div>
             <Button className='bg-linear-to-r from-purple-500 to-pink-500' type="submit" disabled={loading}>
               {!loading ? 'Sign Up': (
                 <>
@@ -116,7 +120,7 @@ export default function SignUp() {
               </Link>
             </div>
 
-            {errorMessage && (<Alert className='mt-5 text-sm' color='failure'>{errorMessage}</Alert>)}
+            {error && (<Alert className='mt-5 text-sm' color='failure'>{error}</Alert>)}
           </form>
         </div>
 

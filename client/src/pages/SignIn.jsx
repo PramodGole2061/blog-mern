@@ -1,12 +1,19 @@
 import {Link, useNavigate} from 'react-router-dom';
 import { Alert, Button, Checkbox, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInStart, signInFailure, signInSuccess, finallyBlock } from '../redux/user/userSlice';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
 
+  //for accessing global states from store.js  => userSlices.js
+  const {loading, error} = useSelector((state)=>(state.user))
+
+  //for function to update global states
+  const dispatch = useDispatch();
+
+  //for navigation to other pages
   const navigate = useNavigate();
 
   const handleChange = (e) =>{
@@ -17,14 +24,13 @@ export default function SignIn() {
 
   
   const handleSubmit = async (e)=>{
-    setErrorMessage(null); //reset error message on new submit
-    setLoading(true); //after clicking submit button, set loading to true
+    dispatch(signInStart());
 
     e.preventDefault(); //prevent default behavior, which is refreshing the page with submit
     
     //basic validation but it must me inside handleSubmit because these fields are initially epmty
     if(!formData.email || !formData.password){
-      setErrorMessage("All fields need to be filled.");
+      dispatch(signInFailure("All fields need to be filled."));
       return;
     }
 
@@ -42,18 +48,18 @@ export default function SignIn() {
       const data = await res.json(); //convert res json object to js object
       
       //we can't do !data.ok because it will always return from this if check even if it was successful
-      if(data.ok === false){
-        return setErrorMessage(data.message);
+      if(!res.ok){
+        return dispatch(signInFailure(data.message));
       }
 
       //if successfull, redirect to signin page
+      signInSuccess(data); //store valided user's info on global state called currentuser in userSlice.js
       navigate('/')
 
     } catch (error) {
-      setErrorMessage("An error occurred during sign in.", error)
-      setLoading(false);
+      dispatch(signInFailure(error.message))
     }finally{
-      setLoading(false);
+      dispatch(finallyBlock())
     }
   }
   return (
@@ -110,7 +116,7 @@ export default function SignIn() {
               </Link>
             </div>
 
-            {errorMessage && (<Alert className='mt-5 text-sm' color='failure'>{errorMessage}</Alert>)}
+            {error && (<Alert className='mt-5 text-sm' color='failure'>{error}</Alert>)}
           </form>
         </div>
 

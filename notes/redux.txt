@@ -1,0 +1,5 @@
+* To implement Redux
+1. search redux toolkit, go to rudux toolkit website, go to quick start
+2. Install Redux Toolkit and React-Redux
+3. inside src crate a folder redux inside it create a file named store.js and paste code from Create a Redux Store
+4. Provide the Redux Store to React. Follow the steps given there
