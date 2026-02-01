@@ -3,3 +3,13 @@
 2. Install Redux Toolkit and React-Redux
 3. inside src crate a folder redux inside it create a file named store.js and paste code from Create a Redux Store
 4. Provide the Redux Store to React. Follow the steps given there
+5. follow rest of the example given in the website
+
+*To implement redux persist
+1. search redux toolkit, go to redux toolkit website, go to usage guide
+2. scroll down on usage guide to find this: Use with Redux-Persist
+3. install redux-persist inside your frontend/client directory
+4. create a rootReducer using combineReducers to combine multiple reducers into one
+5. follow same steps for creating, persistedReducer, configReducer, and const store = configStore() 
+6. also do the persistor but instead of let make it an export, like this : export const persistor = persistStore(store)
+7. go to main.jsx, import persistor, persistGate and put <App /> inside <persistGate persistor={persistor} />

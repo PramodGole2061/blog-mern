@@ -53,7 +53,7 @@ export default function SignIn() {
       }
 
       //if successfull, redirect to signin page
-      signInSuccess(data); //store valided user's info on global state called currentuser in userSlice.js
+      dispatch(signInSuccess(data.restOfCredentials)); //store valided user's info on global state called currentuser in userSlice.js
       navigate('/')
 
     } catch (error) {
