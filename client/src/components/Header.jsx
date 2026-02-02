@@ -1,9 +1,14 @@
-import { Button, Navbar, TextInput, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle } from "flowbite-react";
+import { Button, Navbar, TextInput, DropdownHeader, DropdownDivider, DropdownItem, NavbarCollapse, NavbarLink, NavbarToggle, Dropdown, Avatar } from "flowbite-react";
 import { Link, useLocation } from "react-router-dom"
 import {AiOutlineSearch, AiOutlineMoon} from 'react-icons/ai'
+import {useSelector} from 'react-redux'
 
 
 export default function Header() {
+    //to access global state of user from here
+    const currentUser = useSelector((state)=>(state.user.currentUser))
+    console.log({currentUser})
+
     // urlPath now contains the current path of the url
     const urlPath = useLocation().pathname;
   return (
@@ -29,11 +34,33 @@ export default function Header() {
             <Button className="w-12 h-10 hidden sm:inline" color='grey' pill>
                 <AiOutlineMoon />
             </Button>
-            <Link to='/signin' >
-                <Button className="bg-linear-to-r from-purple-500 to-blue-5000" outline>
-                    Sign In
-                </Button>
-            </Link>
+
+            {/* user profile section or sign in section */}
+            {currentUser ? (
+                <Dropdown arrowIcon={false} inline label={<Avatar img={currentUser.profilePicture} rounded alt="user" />} >
+                    <DropdownHeader>
+                        <span className="block text-sm">{currentUser.name}</span>
+                        <span className="block truncate text-sm font-medium">{currentUser.email}</span>
+                    </DropdownHeader>
+
+                    <Link to='/dashboard?tab=profile'>
+                        <DropdownItem>Profile</DropdownItem>
+                    </Link>
+
+                    <DropdownDivider />
+
+                    <Link>
+                        <DropdownItem>Sign out</DropdownItem>
+                    </Link>
+                </Dropdown>
+            ) : (
+                <Link to='/signin' >
+                    <Button className="bg-linear-to-r from-purple-500 to-blue-5000" outline>
+                        Sign In
+                    </Button>
+                </Link>
+
+            )}
             <NavbarToggle/>
         </div>
         <NavbarCollapse>
