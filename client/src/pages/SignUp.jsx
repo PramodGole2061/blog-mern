@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
 import { signInStart, signInSuccess, signInFailure, finallyBlock } from '../redux/user/userSlice.js';
+import OAuth from '../components/oAuth.jsx';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
@@ -35,7 +36,7 @@ export default function SignUp() {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/api/auth/signup', {
+      const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           "content-type": 'application/json'
@@ -112,14 +113,14 @@ export default function SignUp() {
                   <span className='pl-3'>Signing Up...</span>
                 </>
               )}
-              </Button>
+            </Button>
+            <OAuth />
             <div className='text-sm flex gap-2'>
               <span>Already have an account?</span>
               <Link to='/signin' className='text-blue-500'>
                 sign in
               </Link>
             </div>
-
             {error && (<Alert className='mt-5 text-sm' color='failure'>{error}</Alert>)}
           </form>
         </div>

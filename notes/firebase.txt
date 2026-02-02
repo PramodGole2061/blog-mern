@@ -1,0 +1,26 @@
+*To implement firebase for google O auth
+1. search google firebase, log in, click on go to console
+2. create a new project
+3. click on + or add app button to find options for mobile, web etc,
+4. click on web or </> button
+5. give a name for the web app, do not click on checkbox there i forgot what it was.
+6. go Add Firebase SDK, choose npm , install firebase on your project with the given npm for installing  
+   of course install the npm inside the client/frontend as well
+7. create a file and paste the given code there, this should be in the root of src with file name like firebase.js 
+8. api_key inside firebase.js should be a secret so use .env to hide it. however in the tutorial, it was advised to 
+    create another .env file inside root of client/frontend and start the name of a key with VITE like VITE_API_KEY
+    becasue it is a vite react app. although for now i am testing if it will work normally if i just use the usual .env file
+    update: it failed. also while importing inside client/frontend/react app use: import.meta.env.VITE_EXAMPLE_KEY
+9. export the app at the end of the code, so that it can be imported on other pages and used
+10. click go to console
+11. find authentication, click on it, click get started, click on google button, click enable button on top right, give project name, your email
+    and click on save. it will enable google authentiation 
+12. search google auth provider, go to Google cloud documentation, go to signing in users with google part
+    there is examples or some bits and parts of example there.
+13. const resultFromGoogle = signInWithPopUp(provider, auth);
+
+
+
+
+
+   

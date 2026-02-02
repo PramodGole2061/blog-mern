@@ -2,7 +2,9 @@ import {Link, useNavigate} from 'react-router-dom';
 import { Alert, Button, Checkbox, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
 import { signInStart, signInFailure, signInSuccess, finallyBlock } from '../redux/user/userSlice';
+import OAuth from '../components/oAuth';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
@@ -35,7 +37,7 @@ export default function SignIn() {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/api/auth/signin', {
+      const res = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: {
           "content-type": 'application/json'
@@ -53,7 +55,7 @@ export default function SignIn() {
       }
 
       //if successfull, redirect to signin page
-      dispatch(signInSuccess(data.restOfCredentials)); //store valided user's info on global state called currentuser in userSlice.js
+      dispatch(signInSuccess(data)); //store valided user's info on global state called currentuser in userSlice.js
       navigate('/')
 
     } catch (error) {
@@ -108,7 +110,8 @@ export default function SignIn() {
                   <span className='pl-3'>Signing In...</span>
                 </>
               )}
-              </Button>
+            </Button>
+            <OAuth />
             <div className='text-sm flex gap-2'>
               <span>Haven't registered yet?</span>
               <Link to='/signup' className='text-blue-500'>
