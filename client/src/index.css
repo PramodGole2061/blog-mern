@@ -1,7 +1,8 @@
 @import "tailwindcss";
 @import "flowbite-react/plugin/tailwindcss";
 @source "../.flowbite-react/class-list.json";
- @plugin "daisyui";
+@custom-variant dark (&:where(.dark, .dark *));
+@plugin "daisyui";
 @plugin "daisyui" {
   themes: light, dark, cupcake, business, forest;
 }
