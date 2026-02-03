@@ -54,7 +54,7 @@ export default function OAuth() {
     }
   }
   return (
-    <Button color='pink' type='button' outline onClick={handleGoogleClick}>
+    <Button color='pink' className='cursor-pointer' type='button' outline onClick={handleGoogleClick}>
       <AiOutlineGoogle className='w-6 h-7 mr-1' /><span>Continue with Google</span>
     </Button>
   )

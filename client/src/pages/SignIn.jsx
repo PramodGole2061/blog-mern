@@ -103,7 +103,7 @@ export default function SignIn() {
               <Checkbox id="remember" />
               <Label htmlFor="remember">Remember me</Label>
             </div>
-            <Button className='bg-linear-to-r from-purple-500 to-pink-500' type="submit" disabled={loading}>
+            <Button className='cursor-pointer' color='green' outline type="submit" disabled={loading}>
               {!loading ? 'Sign In': (
                 <>
                   <Spinner size='sm' />

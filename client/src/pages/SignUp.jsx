@@ -106,7 +106,7 @@ export default function SignUp() {
               </div>
               <TextInput id="password" type="password" placeholder='password' required onChange={handleChange}/>
             </div>
-            <Button className='bg-linear-to-r from-purple-500 to-pink-500' type="submit" disabled={loading}>
+            <Button className=' cursor-pointer' outline type="submit" disabled={loading}>
               {!loading ? 'Sign Up': (
                 <>
                   <Spinner size='sm' />

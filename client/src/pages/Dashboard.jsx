@@ -32,7 +32,7 @@ export default function Dashboard() {
         {/* Dashboard Sidebar */}
         <DashboardSidebar />
       </div>
-      <div>
+      <div className="w-full"> {/*w-full here important for mx-auto to work on <DashboardProfile />*/}
         {/* Profile */}
         {tab === 'profile' && <DashboardProfile />}
       </div>
