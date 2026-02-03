@@ -16,7 +16,7 @@ export default function Header() {
     //for accessing global theme states
     const {theme} = useSelector((state)=>(state.theme));
     const dispatch = useDispatch();
-    console.log(theme)
+    // console.log(theme)
 
   return (
     // border-b-amber-500 is not working, it should give bottom border with amber color
