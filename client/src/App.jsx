@@ -17,7 +17,7 @@ export default function App() {
       <Routes>
         <Route path="/" element = {<Home />} />
         <Route path="/about" element = {<About />} />
-        <Route element={<PrivateRoute />}> {/* Before gaining access to /dashboard, if go through <PrivateRoute /> */}
+        <Route element={<PrivateRoute />}> {/* Before gaining access to /dashboard, go through <PrivateRoute /> */}
           <Route path="/dashboard" element = {<Dashboard />} />
         </Route>
         <Route path="/projects" element = {<Projects />} />

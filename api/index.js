@@ -2,11 +2,12 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+//Parse Cookie header and populate req.cookies
+import cookieParser from 'cookie-parser';
 
 import dbConnection from './config/dbConnection.js';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js'
-import { error } from 'console';
 
 //this will make dotenv.config() to be global on all files
 dotenv.config();
@@ -15,6 +16,9 @@ const app = express();
 
 //remove cors erors
 app.use(cors());
+
+//allow parsing of req.cookies
+app.use(cookieParser());
 
 //connect to db
 dbConnection().then(()=>{
