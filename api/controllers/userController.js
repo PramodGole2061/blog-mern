@@ -27,6 +27,9 @@ export const updateUser = async (req, res, next)=>{
 
     //check if password is to be updated
     if(req.body.password){
+        if(validator.isEmpty(req.body.password)){
+            return next(errorHandler(400, 'Password can not be empty!'));
+        }
         if(!validator.isStrongPassword(req.body.password)){
             return next(errorHandler(400, "Not a strong password!"));
         }
@@ -51,6 +54,11 @@ export const updateUser = async (req, res, next)=>{
 
         if(!req.body.name.match(/^[a-zA-Z0-9]+$/)){
             return next(errorHandler(400, 'User name can only consist of letters and numbers.'))
+        }
+
+        const userExist = await User.findOne({name: req.body.name});
+        if(userExist && userExist._id.toString() !== req.params.userId){
+            return next(errorHandler(400, 'Username already exists!'));
         }
     }
 

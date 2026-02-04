@@ -1,10 +1,61 @@
-import { Button, TextInput } from 'flowbite-react';
+import { Alert, Button, TextInput } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
-import {useSelector} from 'react-redux'
+import {useSelector, useDispatch} from 'react-redux'
+import { updateStart, updateSuccess, updateFailure } from '../redux/user/userSlice';
+import toast from 'react-hot-toast';
 
 export default function DashboardProfile() {
-    const {currentUser} = useSelector((state)=>(state.user));
+    const {currentUser, error} = useSelector((state)=>(state.user));
+    const dispatch = useDispatch();
+
     const [imageFile, setImageFile] = useState(null);
+    const [formData, setFormData] = useState({});
+
+
+    const handleFormUpdate = (e) =>{
+      setFormData({...formData, [e.target.id]: e.target.value.trim()});
+    }
+
+    // console.log({formData})
+
+    const handleSubmit = async (e)=>{
+      e.preventDefault();
+
+      //it will always return true, if some fields are not changed
+      // if(!formData.name || !formData.email || !formData.password){
+      //   return dispatch(updateFailure('Fields can not be empty!'));
+      // }
+
+      //check if formData is empty
+      if(Object.keys(formData).length === 0){
+        return;
+      }
+
+      try {
+        dispatch(updateStart());
+
+        const res = await fetch(`/api/user/update/${currentUser._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        })
+
+        const data = await res.json();
+
+        if(res.ok){
+          dispatch(updateSuccess(data));
+          toast.success('Updated successfully!');
+        }else{
+          dispatch(updateFailure(data.message));
+        }
+        
+      } catch (error) {
+        dispatch(updateFailure(error));
+      }
+    }
+
     //instead of working with file/image/object address directly
     // convert file/object loacation/address into an url, which can only work inside user's browser
     const [imageFileUrl, setImageFileUrl] = useState(null);
@@ -33,16 +84,16 @@ export default function DashboardProfile() {
 
 
     const uploadImage = async ()=>{ //async because it can take time
-      console.log('Uploading image...');
+      setFormData({...formData, profilePicture: imageFileUrl})
     }
 
-    console.log({imageFile, imageFileUrl})
+    // console.log({imageFile, imageFileUrl})
 
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
       <div className='my-7 text-center text-3xl font-bold'>Profile</div>
 
-      <form className='flex flex-col gap-4' >
+      <form className='flex flex-col gap-4' onSubmit={handleSubmit} >
         {/* For uploading an image file */} {/*after referencing it with <div><img></div> make it hidden*/}
         <input type='file' accept='image/*' onChange={handleImageUpload} ref={filePickerReference} hidden className='cursor-pointer' /> {/* accept image with any type(*) */}
           {/* when it is clicked, above <inpput /> would be executed */}
@@ -50,16 +101,18 @@ export default function DashboardProfile() {
               {/* if imageFile is not null use imageFile else currentUser.profilePicture */}
               <img src={imageFileUrl || currentUser.profilePicture} className='rounded-full w-full h-full object-cover border-8 border-[lightgray]' alt='User'/>
           </div>
-        <TextInput type='text' id='name' defaultValue={currentUser.name} placeholder='name' />
-        <TextInput type='email' id='email' defaultValue={currentUser.email} placeholder='email' />
-        <TextInput type='password' id='password' placeholder='password' />
-        <Button type='submit' outline >Update</Button>
+        <TextInput type='text' id='name' defaultValue={currentUser.name} placeholder='name' onChange={handleFormUpdate} required/>
+        <TextInput type='email' id='email' defaultValue={currentUser.email} placeholder='email' onChange={handleFormUpdate} required/>
+        <TextInput type='password' id='password' placeholder='password' onChange={handleFormUpdate} />
+        <Button type='submit' disabled={Object.keys(formData).length === 0} outline >Update</Button>
       </form>
 
       <div className='flex justify-between p-1 text-red-500 mt-5'>
         <span className='cursor-pointer'>Delete Account</span>
         <span className='cursor-pointer'>Log Out</span>
       </div>
+
+      {error && (<Alert className='text-sm mt-3 mb-3' color='failure'>{error}</Alert>)}
     </div>
   )
 }
