@@ -84,3 +84,22 @@ export const updateUser = async (req, res, next)=>{
     }
 }
 
+export const deleteUser = async (req, res, next)=>{
+    if(req.userData.id !== req.params.userId){
+        return next(errorHandler(400, "Not authorized!"));
+    }
+
+    try {
+        const deleteUser = await User.findByIdAndDelete(req.params.userId)
+
+        if(!deleteUser){
+            next(errorHandler(400, "User not found!"));
+        }
+
+        res.status(200).json('User deleted successfully!');
+
+    } catch (error) {
+        next(error)
+    }
+}
+
