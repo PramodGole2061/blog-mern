@@ -43,13 +43,31 @@ export const userSlice = createSlice({
         updateFailure: (state, action) =>{
             state.loading = false,
             state.error = action.payload
+        },
+        delelteStart: (state)=>{
+            state.loading = true,
+            state.error = null
+        },
+        deleteFailture: (state, action) =>{
+            state.loading = false,
+            state.error = action.payload
+        },
+        deleteSuccess: (state, action)=>{
+            state.loading = false,
+            state.currentUser = null
         }
+
     }
 })
 
 //this will allow us to dispatch the actions from the components.
 // which means we can call these functions from any component to update the global states
-export const {signInStart, signInSuccess, signInFailure, finallyBlock, updateStart, updateSuccess, updateFailure} = userSlice.actions;
+export const {
+    signInStart, signInSuccess, signInFailure, 
+    finallyBlock, 
+    updateStart, updateSuccess, updateFailure,
+    delelteStart, deleteFailture, deleteSuccess
+} = userSlice.actions;
 
 //this will allow us to add this slice to the store
 //it will export the reducer function that will be used in the store
