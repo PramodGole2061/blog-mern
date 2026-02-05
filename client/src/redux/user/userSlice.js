@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { act } from 'react';
 
 //These are the global states which can be accessed from any component
 const initialState = {
@@ -55,6 +56,15 @@ export const userSlice = createSlice({
         deleteSuccess: (state, action)=>{
             state.loading = false,
             state.currentUser = null
+        },
+        signoutSuccess : (state)=>{
+            state.loading = false,
+            state.currentUser = null,
+            state.error = null
+        },
+        signoutFailure : (state, action)=>{
+            state.loading = false,
+            state.error = action.payload
         }
 
     }
@@ -66,7 +76,8 @@ export const {
     signInStart, signInSuccess, signInFailure, 
     finallyBlock, 
     updateStart, updateSuccess, updateFailure,
-    delelteStart, deleteFailture, deleteSuccess
+    delelteStart, deleteFailture, deleteSuccess,
+    signoutSuccess, signoutFailure
 } = userSlice.actions;
 
 //this will allow us to add this slice to the store

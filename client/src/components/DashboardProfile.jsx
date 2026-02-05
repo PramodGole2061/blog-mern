@@ -1,7 +1,7 @@
 import { Alert, Button, TextInput, Modal, ModalBody, ModalHeader } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
-import { updateStart, updateSuccess, updateFailure, delelteStart, deleteFailture, deleteSuccess } from '../redux/user/userSlice';
+import { updateStart, updateSuccess, updateFailure, delelteStart, deleteFailture, deleteSuccess, signoutSuccess, signoutFailure, signInStart } from '../redux/user/userSlice';
 import toast from 'react-hot-toast';
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 
@@ -115,6 +115,25 @@ export default function DashboardProfile() {
       }
     }
 
+    const handleSignOut = async ()=>{
+      try {
+        const res = await fetch(`/api/user/signout`, {
+          method: 'POST'
+        })
+
+        const data = await res.json();
+
+        if(res.ok){
+          dispatch(signoutSuccess());
+        }else{
+          dispatch(signoutFailure(data.message));
+        }
+
+      } catch (error) {
+        dispatch(signoutFailure(error))
+      }
+    }
+
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
       <div className='my-7 text-center text-3xl font-bold'>Profile</div>
@@ -135,7 +154,7 @@ export default function DashboardProfile() {
 
       <div className='flex justify-between p-1 text-red-500 mt-5'>
         <span onClick={(()=>(setOpenModal(true)))} className='cursor-pointer'>Delete Account</span>
-        <span className='cursor-pointer'>Log Out</span>
+        <span onClick={()=>(handleSignOut())} className='cursor-pointer'>Log Out</span>
       </div>
 
       {error && (<Alert className='text-sm mt-3 mb-3' color='failure'>{error}</Alert>)}

@@ -4,6 +4,7 @@ import {AiOutlineSearch, AiOutlineMoon, AiOutlineSun} from 'react-icons/ai'
 import {useSelector, useDispatch} from 'react-redux'
 
 import { toggleTheme } from "../redux/theme/themeSlice";
+import { signoutFailure, signoutSuccess } from "../redux/user/userSlice";
 
 export default function Header() {
     //to access global state of user from here
@@ -17,6 +18,25 @@ export default function Header() {
     const {theme} = useSelector((state)=>(state.theme));
     const dispatch = useDispatch();
     // console.log(theme)
+
+    const handleSignOut = async ()=>{
+          try {
+            const res = await fetch(`/api/user/signout`, {
+              method: 'POST'
+            })
+    
+            const data = await res.json();
+    
+            if(res.ok){
+              dispatch(signoutSuccess());
+            }else{
+              dispatch(signoutFailure(data.message));
+            }
+    
+          } catch (error) {
+            dispatch(signoutFailure(error))
+          }
+        }
 
   return (
     // border-b-amber-500 is not working, it should give bottom border with amber color
@@ -57,12 +77,12 @@ export default function Header() {
                     <DropdownDivider />
 
                     <Link>
-                        <DropdownItem>Sign out</DropdownItem>
+                        <DropdownItem onClick={()=>(handleSignOut())}>Sign out</DropdownItem>
                     </Link>
                 </Dropdown>
             ) : (
                 <Link to='/signin' >
-                    <Button className="bg-linear-to-r from-purple-500 to-blue-5000" outline>
+                    <Button color= 'green' outline>
                         Sign In
                     </Button>
                 </Link>
