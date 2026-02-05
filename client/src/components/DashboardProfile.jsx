@@ -86,9 +86,41 @@ export default function DashboardProfile() {
     }, [imageFile]) //if imageFile changes, execute the function
 
 
-    const uploadImage = async ()=>{ //async because it can take time
-      setFormData({...formData, profilePicture: imageFileUrl})
+    const uploadImage = async ()=>{
+      if(!imageFile){
+        return;
+      }
+
+      try {
+        const dataForCloudinary = new FormData();
+        // 'file' must be 'file'
+        dataForCloudinary.append('file', imageFile); 
+        dataForCloudinary.append('upload_preset', 'blog_users_avatars')
+        dataForCloudinary.append('cloud_name', import.meta.env.VITE_CLOUDINARY_CLOUD_NAME)
+
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: dataForCloudinary
+        })
+
+        const data = await res.json();
+
+        if(res.ok){
+          // downloadUrl is permanent and can be accessed or viewed by anyone
+          const downloadUrl = data.secure_url;
+          //in order to add the permanent url to the database, first add it to formData
+          setFormData({...formData, profilePicture: downloadUrl})
+
+          toast.success('Image uploaded!');
+        }
+
+      } catch (error) {
+        dispatch(updateFailure(error))
+        // console.log("Upload error: ", error)
+      }
+
     }
+    console.log({formData})
 
     // console.log({imageFile, imageFileUrl})
 
@@ -149,7 +181,7 @@ export default function DashboardProfile() {
         <TextInput type='text' id='name' defaultValue={currentUser.name} placeholder='name' onChange={handleFormUpdate} required/>
         <TextInput type='email' id='email' defaultValue={currentUser.email} placeholder='email' onChange={handleFormUpdate} required/>
         <TextInput type='password' id='password' placeholder='password' onChange={handleFormUpdate} />
-        <Button type='submit' disabled={Object.keys(formData).length === 0} outline >Update</Button>
+        <Button type='submit' disabled={Object.keys(formData).length === 0 && !imageFile} outline >Update</Button>
       </form>
 
       <div className='flex justify-between p-1 text-red-500 mt-5'>
