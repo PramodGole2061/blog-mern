@@ -6,3 +6,11 @@
 @plugin "daisyui" {
   themes: light, dark, cupcake, business, forest;
 }
+
+body{
+  height: 100vh;
+}
+
+.ql-toolbar{
+  font-size: 1.05rem;
+}

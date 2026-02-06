@@ -4,22 +4,23 @@ import {useSelector, useDispatch} from 'react-redux'
 import { updateStart, updateSuccess, updateFailure, delelteStart, deleteFailture, deleteSuccess, signoutSuccess, signoutFailure, signInStart } from '../redux/user/userSlice';
 import toast from 'react-hot-toast';
 import { HiOutlineExclamationCircle } from "react-icons/hi";
-
+import {Link} from 'react-router-dom'
 
 export default function DashboardProfile() {
-    const {currentUser, error} = useSelector((state)=>(state.user));
+    const {currentUser, error, loading} = useSelector((state)=>(state.user));
     const dispatch = useDispatch();
 
     const [imageFile, setImageFile] = useState(null);
     const [formData, setFormData] = useState({});
     const [openModal, setOpenModal] = useState(false);
+    const [imageUploading, setImageUploading] = useState(false);
 
 
     const handleFormUpdate = (e) =>{
       setFormData({...formData, [e.target.id]: e.target.value.trim()});
     }
 
-    // console.log({formData})
+    // console.log({formData, formLength: Object.keys(formData).length, password: formData.password, isPasswordEmpty: formData.password})
 
     const handleSubmit = async (e)=>{
       e.preventDefault();
@@ -30,8 +31,8 @@ export default function DashboardProfile() {
       // }
 
       //check if formData is empty
-      if(Object.keys(formData).length === 0){
-        return;
+      if(Object.keys(formData).length === 0 || formData.password === '' || formData.email === '' || formData.name === ''){
+        return dispatch(updateFailure('Empty field can not updated!'));
       }
 
       try {
@@ -92,6 +93,8 @@ export default function DashboardProfile() {
       }
 
       try {
+        setImageUploading(true);
+
         const dataForCloudinary = new FormData();
         // 'file' must be 'file'
         dataForCloudinary.append('file', imageFile); 
@@ -115,12 +118,15 @@ export default function DashboardProfile() {
         }
 
       } catch (error) {
+        setImageUploading(false);
         dispatch(updateFailure(error))
         // console.log("Upload error: ", error)
+      }finally{
+        setImageUploading(false)
       }
 
     }
-    console.log({formData})
+    // console.log({formData})
 
     // console.log({imageFile, imageFileUrl})
 
@@ -180,8 +186,20 @@ export default function DashboardProfile() {
           </div>
         <TextInput type='text' id='name' defaultValue={currentUser.name} placeholder='name' onChange={handleFormUpdate} required/>
         <TextInput type='email' id='email' defaultValue={currentUser.email} placeholder='email' onChange={handleFormUpdate} required/>
+
         <TextInput type='password' id='password' placeholder='password' onChange={handleFormUpdate} />
-        <Button type='submit' disabled={Object.keys(formData).length === 0 && !imageFile} outline >Update</Button>
+        <Button type='submit' disabled={loading || imageUploading} outline >
+          {loading ? 'Updating...' : 'Update'}
+        </Button>
+
+        {/* for admin button */}
+        {
+          currentUser.isAdmin && (
+            <Link to='/create-post'>
+              <Button type='button' className='w-full' outline>Create a Post</Button>
+            </Link>
+          )
+        }
       </form>
 
       <div className='flex justify-between p-1 text-red-500 mt-5'>
