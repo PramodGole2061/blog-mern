@@ -27,7 +27,12 @@ export const signup = async (req, res, next) => {
 
         const savedUser = await newUser.save();
 
-        res.status(200).json({message: "User registered successfully!", user: savedUser})
+        //create token
+        const token = jwt.sign({id: newUser._id, isAdmin: newUser.isAdmin}, process.env.JWT_SECRET);
+
+        const {password, ...restOfCredentials} = newUser._doc;
+
+        res.status(200).cookie('access-token', token, {httpOnly: true}).json(restOfCredentials)
     }catch(err){
         console.error("Signup error at authController: ", err);
         next(err);
@@ -59,7 +64,8 @@ export const signin = async (req, res, next)=>{
         }
 
         //give a token to the valid user
-        const token = jwt.sign({id: validUser._id}, process.env.JWT_SECRET);
+        //we can put some user data into the token, here id and isAdmin is added, which can be accessed later
+        const token = jwt.sign({id: validUser._id, isAdmin: validUser.isAdmin}, process.env.JWT_SECRET);
 
         //to remove password from the response
         const {password: pass, ...restOfCredentials} = validUser._doc;
@@ -85,7 +91,7 @@ export const googleAuth = async (req, res, next) =>{
             //since user has already signed up. Sign in the user
 
             //generate a token from their _id
-            const token = jwt.sign({id: user._id}, process.env.JWT_SECRET);
+            const token = jwt.sign({id: user._id, isAdmin: user.isAdmin}, process.env.JWT_SECRET);
             
             //remove password in the response
             const {password, ...restOfCredentials} = user._doc;

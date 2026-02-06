@@ -9,7 +9,7 @@ import { signoutFailure, signoutSuccess } from "../redux/user/userSlice";
 export default function Header() {
     //to access global state of user from here
     const currentUser = useSelector((state)=>(state.user.currentUser))
-    console.log({currentUser})
+    // console.log({currentUser})
 
     // urlPath now contains the current path of the url
     const urlPath = useLocation().pathname;

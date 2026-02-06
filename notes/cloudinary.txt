@@ -1,0 +1,5 @@
+* To download user image url which is permanent and can be used by anyone anywhere
+1. go to cloudinary
+2. settings -> upload
+3. write preset name, /foldername, leave everything else the same/default and click save
+4. follow the code on DashboardProfile.jsx
