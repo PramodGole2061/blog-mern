@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import dbConnection from './config/dbConnection.js';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js'
+import postRoutes from './routes/postRoutes.js'
 
 //this will make dotenv.config() to be global on all files
 dotenv.config();
@@ -35,6 +36,8 @@ app.use(express.json());
 app.use('/api/user', userRoutes);
 //auth routes
 app.use('/api/auth', authRoutes)
+//post routes
+app.use('/api/post', postRoutes)
 
 //middleware for handling errors
 app.use((error, req, res, next) =>{
