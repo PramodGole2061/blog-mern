@@ -30,3 +30,56 @@ export const create = async (req, res, next)=>{
         next(errorHandler(400, "Error saving post!"))   
     }
 }
+
+export const fetch = async(req, res, next)=>{
+
+    try {
+        //from which index to show posts, users can specify which index to start otherwise start from 0
+        //eg: /api/post/fetch?startIndex=8, then posts form index 8 and above will be fetched
+        const startIndex = parseInt(req.query.startIndex) || 0
+        //how many to fetch at once
+        //eg: /api/post/fetch?limit=3, then only 3 will be fetched. if not explicitely mentioned only 9 will fetched
+        const limit = parseInt(req.query.limit) || 9;
+        //if order=asc, fetch in ascending order (1) otherwise in descending order(-1)
+        const sortDirection = req.query.order === 'asc' ? 1 : -1;
+
+        const fetchedPosts = await Post.find({ //fetch with conditions, based on the query
+            //if query has userId, set userId to req.query.userId and fetch from that specific userId(which is set on /create)
+            ...(req.query.userId && {userId: req.query.userId}),
+            //is category explicitely mentioned in the query
+            ...(req.query.category && {category: req.query.category}),
+            ...(req.query.slug && {category: req.query.slug}),
+            ...(req.query.postId && {_id: req.query.postId}),
+            //if searchTerm is in the query for searching
+            ...(req.query.searchTerm && {
+                //$or: [], will check for both title and content to find the searchTerm
+                $or: [
+                    //$regex: will search the specific word/searchTerm in the title and content
+                    //$options: 'i', makes the regex search case insensitive
+                    {title: {$regex: req.query.searchTerm, $options: 'i'}},
+                    {content: {$regex: req.query.searchTerm, $options: 'i'}}
+                ]
+            })
+        }).sort({updatedAt: sortDirection}).skip(startIndex).limit(limit);
+
+        const totalPosts = await Post.countDocuments();
+
+        //for checking how many posts were made 1 month ago
+        const now = new Date();
+        const oneMonthAgo = new Date(
+            now.getFullYear(),
+            now.getMonth() -1,
+            now.getDate()
+        )
+
+        const lastMonthPosts = await Post.countDocuments({
+            //$gte: , refers to greater than or equal to and $lte, refers to lass than or equal to
+            createdAt: {$gte: oneMonthAgo},
+        })
+
+        res.status(200).json({fetchedPosts, totalPosts, lastMonthPosts})
+    } catch (error) {
+        // next(errorHandler(400, 'Error fetching user posts!'))
+        next(error)
+    }
+}
