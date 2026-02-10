@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
+import { Button, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useSelector } from "react-redux";
@@ -9,7 +9,8 @@ export default function DashboardPosts() {
     const {currentUser} = useSelector((state)=>(state.user));
 
     const [userPosts, setUserPosts] = useState([]);
-    console.log(userPosts)
+    // console.log(userPosts)
+    const [showMore, setShowMore] = useState(true);
 
     useEffect(()=>{
         const fetchPosts = async ()=>{
@@ -22,6 +23,9 @@ export default function DashboardPosts() {
                     //from backend an object with fetchedPosts, totalPosts and lastMonthPosts are sent in the res
                     //so specify fetchedPosts otherwise it will remain an object and .length will show 0 or u
                     setUserPosts(data.fetchedPosts);
+                    if(data.fetchedPosts.length < 9){
+                        setShowMore(false);
+                    }
                 }else{
                     toast.error('Internal server error!')
                     console.log('Error given from server: ', data.message);
@@ -36,6 +40,31 @@ export default function DashboardPosts() {
             fetchPosts();
         }
     }, [currentUser._id])
+
+    const handleShowMore = async ()=>{
+        //set the startIndex from the length of current userPosts state, because it has all the fetched posts till now
+        const startIndex = userPosts.length;
+        try {
+            //use current startIndex to fetch from that index
+            const res = await fetch(`/api/post/fetch?${currentUser._id}&startIndex=${startIndex}`);
+
+            const data = await res.json();
+
+            if(res.ok){
+                //add newly fetched posts inside userPosts state
+                setUserPosts((prev)=>([...prev, ...data.fetchedPosts]));
+                if(data.fetchedPosts.length < 9){
+                    setShowMore(false);
+                }
+            }else{
+                toast.error('Error fetching more posts!')
+                console.error('Error from server at handleShowMore function at DashboardPosts.jsx: ', data.message);
+            }
+        } catch (error) {
+            toast.error('Error fetching more posts!');
+            console.log('Error at handleShowMore function for show more button: ', error)
+        }
+    }
   return (
     <div className="table-auto overflow-x-auto md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 scrollbar-thumb-slate-500">
       {currentUser.isAdmin && userPosts.length > 0 ? 
@@ -92,6 +121,11 @@ export default function DashboardPosts() {
                 </TableBody>
             ))}
         </Table>
+        {showMore && (
+            <button onClick={handleShowMore} className="w-full self-center text-sm text-teal-500 py-7 hover:underline cursor-pointer">
+                Show More
+            </button>
+        )}
       </>)
       : 
       (<p>No posts</p>)}
