@@ -83,3 +83,20 @@ export const fetch = async(req, res, next)=>{
         next(error)
     }
 }
+
+export const deletePost = async (req, res, next)=>{
+    if(!req.userData.isAdmin || req.userData.id !== req.params.userId){
+        return next(errorHandler(403, 'You are not authorized to delete this post!'));
+    }
+
+    try {
+        const deletedPost = await Post.findByIdAndDelete(req.params.postId);
+        if(deletedPost){
+            res.status(200).json('Post deleted successfully!');
+        }else{
+            next(errorHandler(500, 'Error deleting the post!'));
+        }
+    } catch (error) {
+        next(errorHandler(400, 'Error deleting the post!'));
+    }
+}

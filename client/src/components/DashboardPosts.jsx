@@ -1,9 +1,11 @@
-import { Button, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from "flowbite-react";
+import { Button, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Modal, ModalBody, ModalHeader  } from "flowbite-react";
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useSelector } from "react-redux";
 import {format} from 'date-fns'
-import {Link} from 'react-router-dom'
+import {data, Link} from 'react-router-dom'
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+
 
 export default function DashboardPosts() {
     const {currentUser} = useSelector((state)=>(state.user));
@@ -11,6 +13,8 @@ export default function DashboardPosts() {
     const [userPosts, setUserPosts] = useState([]);
     // console.log(userPosts)
     const [showMore, setShowMore] = useState(true);
+    const [openModal, setOpenModal] = useState(false);
+    const [postIdToDelete, setPostIdToDelete] = useState(null);
 
     useEffect(()=>{
         const fetchPosts = async ()=>{
@@ -65,6 +69,31 @@ export default function DashboardPosts() {
             console.log('Error at handleShowMore function for show more button: ', error)
         }
     }
+
+    const handlePostDelete = async()=>{
+        setOpenModal(false);
+        try {
+            const res = await fetch(`/api/post/delete/${postIdToDelete}/${currentUser._id}`, {
+                method: 'DELETE'
+            })
+
+            const data = await res.json();
+
+            if(res.ok){
+                //remove the post from the screen as well
+                setUserPosts((prev)=>
+                    prev.filter((post)=>(post._id !== postIdToDelete))
+                );
+                toast.success('Post deleted successfully!');
+            }else{
+                toast.error('Error deleting post1!');
+                console.error('Error from server for deleting post at handlePostDelete function inside DashboardPosts.jsx: ', data.message)
+            }
+        } catch (error) {
+            toast.error('Error deleting post!');
+            console.error('Error deleting post at catch at handlePostDelete function at DashboardPosts.jsx: ', error)
+        }
+    }
   return (
     <div className="table-auto overflow-x-auto md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 scrollbar-thumb-slate-500">
       {currentUser.isAdmin && userPosts.length > 0 ? 
@@ -110,7 +139,10 @@ export default function DashboardPosts() {
                             {post.category}
                         </TableCell>
                         <TableCell>
-                            <span className="text-red-500 font-medium hover:underline cursor-pointer">Delete</span>
+                            <span onClick={()=>{
+                                setOpenModal(true);
+                                setPostIdToDelete(post._id);
+                            }} className="text-red-500 font-medium hover:underline cursor-pointer">Delete</span>
                         </TableCell>
                         <TableCell>
                             <Link to={`/update-post/${post._id}`}>
@@ -129,6 +161,25 @@ export default function DashboardPosts() {
       </>)
       : 
       (<p>No posts</p>)}
+      <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+        <ModalHeader />
+        <ModalBody>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this post?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="red" onClick={() => handlePostDelete()}>
+                Yes, I'm sure
+              </Button>
+              <Button color="alternative" onClick={() => setOpenModal(false)}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </ModalBody>
+      </Modal>
     </div>
   )
 }
