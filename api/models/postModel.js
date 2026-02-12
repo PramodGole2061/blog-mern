@@ -16,7 +16,7 @@ const postSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        default: 'https://img.freepik.com/premium-vector/blog-post-concept-illustration_114360-26355.jpg'
+        default: 'https://simplybuiltsites.com/wp-content/uploads/how-to-write-a-blog-post.png'
     },
     category: {
         type: String,

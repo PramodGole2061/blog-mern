@@ -1,5 +1,5 @@
 import express from 'express';
-import { create, fetch, deletePost } from '../controllers/postController.js';
+import { create, fetch, deletePost, updatePost } from '../controllers/postController.js';
 
 import { verifyUser } from '../utils/verifyUser.js';
 
@@ -13,5 +13,8 @@ router.get('/fetch', fetch)
 
 //to delete posts
 router.delete('/delete/:postId/:userId', verifyUser, deletePost)
+
+//to update post
+router.put('/update/:postId/:userId', verifyUser, updatePost)
 
 export default router;
