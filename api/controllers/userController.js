@@ -111,3 +111,46 @@ export const signoutUser = (req, res, next)=>{
     }
 }
 
+export const fetchUsers = async(req, res, next)=>{
+    if(!req.userData.isAdmin){
+        return next(errorHandler(403, 'You are not authorized!'));
+    }
+    try {
+        const startIndex = parseInt(req.query.startIndex) || 0;
+        const limit = parseInt(req.query.limit) || 9;
+        const sortDirection = req.query.sortDirection === 'asc' ? 1 : -1;
+
+        const fetchedUsers = await User.find().sort({createdAt: sortDirection}).skip(startIndex).limit(limit);
+
+        //remove the password from each user before sending response to frontend
+        //since fetchedUsers will fetch users we need to loop for each user to remove password
+        const usersWithoutPassword = fetchedUsers.map((user)=>{
+            const {password, ...rest} = user._doc;
+            return rest;
+        })
+
+        const numberOfUsers = await User.countDocuments();
+
+        const now = new Date();
+
+        const oneMonthAgo = new Date(
+            now.getFullYear(),
+            now.getMonth() -1,
+            now.getDate()
+        )
+
+        const lastMonthUsers = await User.countDocuments({
+            createdAt: {$gte: oneMonthAgo}
+        })
+
+        res.status(200).json({
+            fetchedUsers: usersWithoutPassword,
+            numberOfUsers: numberOfUsers,
+            lastMonthUsers: lastMonthUsers
+        })
+
+    } catch (error) {
+        next(errorHandler(400, 'Error fetching users!'));
+        //next(error)
+    }
+}

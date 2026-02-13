@@ -1,7 +1,7 @@
 import express from 'express';
 
 // using {} to import is allowed only for named exports which looks like this: export const testApi = ()=>{}
-import {updateUser, deleteUser, signoutUser, testApi} from '../controllers/userController.js';
+import {updateUser, deleteUser, signoutUser, fetchUsers, testApi} from '../controllers/userController.js';
 import { verifyUser } from '../utils/verifyUser.js';
 
 const router = express.Router();
@@ -17,5 +17,8 @@ router.delete('/delete/:userId', verifyUser, deleteUser)
 
 //for signing out user
 router.post('/signout', signoutUser)
+
+//for fetching users
+router.get('/fetch', verifyUser, fetchUsers)
 
 export default router;
