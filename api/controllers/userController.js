@@ -85,7 +85,9 @@ export const updateUser = async (req, res, next)=>{
 }
 
 export const deleteUser = async (req, res, next)=>{
-    if(req.userData.id !== req.params.userId){
+    //if req.userData.isAdmin is true it doesn't go to next one and goes directly to try and catch
+    //if req.userData.isAdmin is false it will check req.userData.id !== req.params.userId
+    if(!req.userData.isAdmin && req.userData.id !== req.params.userId){
         return next(errorHandler(400, "Not authorized!"));
     }
 

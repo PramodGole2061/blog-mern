@@ -74,7 +74,7 @@ export default function DashboardUsers() {
     const handleUserDelete = async()=>{
         setOpenModal(false);
         try {
-            const res = await fetch(`/api/user/delete/${userIdToDelete}/${currentUser._id}`, {
+            const res = await fetch(`/api/user/delete/${userIdToDelete}`, {
                 method: 'DELETE'
             })
 
@@ -83,7 +83,7 @@ export default function DashboardUsers() {
             if(res.ok){
                 //remove the post from the screen as well
                 setUsers((prev)=>
-                    prev.filter((post)=>(post._id !== userIdToDelete))
+                    prev.filter((user)=>(user._id !== userIdToDelete))
                 );
                 toast.success('User deleted successfully!');
             }else{
