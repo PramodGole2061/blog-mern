@@ -5,29 +5,30 @@ import { useSelector } from "react-redux";
 import {format} from 'date-fns'
 import {data, Link} from 'react-router-dom'
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import {FaCheck, FaTimes} from 'react-icons/fa';
 
 
-export default function DashboardPosts() {
+export default function DashboardUsers() {
     const {currentUser} = useSelector((state)=>(state.user));
 
-    const [userPosts, setUserPosts] = useState([]);
+    const [users, setUsers] = useState([]);
     // console.log(userPosts)
     const [showMore, setShowMore] = useState(true);
     const [openModal, setOpenModal] = useState(false);
-    const [postIdToDelete, setPostIdToDelete] = useState(null);
+    const [userIdToDelete, setUserIdToDelete] = useState(null);
 
     useEffect(()=>{
-        const fetchPosts = async ()=>{
+        const fetchUsers = async ()=>{
             try {
-                const res = await fetch(`/api/post/fetch?userId=${currentUser._id}`);
+                const res = await fetch(`/api/user/fetch`);
 
                 const data = await res.json();
 
                 if(res.ok){
-                    //from backend an object with fetchedPosts, totalPosts and lastMonthPosts are sent in the res
-                    //so specify fetchedPosts otherwise it will remain an object and .length will show 0 or u
-                    setUserPosts(data.fetchedPosts);
-                    if(data.fetchedPosts.length < 9){
+                    //from backend an object with fetchedUsers, numberOfUsers and lastMonthUsers are sent in the res
+                    //so specify fetchedUsers otherwise it will remain an object and .length will show 0 or undefined
+                    setUsers(data.fetchedUsers);
+                    if(data.fetchedUsers.length < 9){
                         setShowMore(false);
                     }
                 }else{
@@ -35,45 +36,45 @@ export default function DashboardPosts() {
                     console.log('Error given from server: ', data.message);
                 }
             } catch (error) {
-                toast.error("Failed to fetch posts!");
-                console.log('Error fetching posts at DashboardPosts.jsx: ', error);
+                toast.error("Failed to fetch users!");
+                console.log('Error fetching users at DashboardUsers.jsx: ', error);
             }
         }
 
         if(currentUser.isAdmin){
-            fetchPosts();
+            fetchUsers();
         }
     }, [currentUser._id])
 
     const handleShowMore = async ()=>{
         //set the startIndex from the length of current userPosts state, because it has all the fetched posts till now
-        const startIndex = userPosts.length;
+        const startIndex = users.length;
         try {
             //use current startIndex to fetch from that index
-            const res = await fetch(`/api/post/fetch?${currentUser._id}&startIndex=${startIndex}`);
+            const res = await fetch(`/api/user/fetch?startIndex=${startIndex}`);
 
             const data = await res.json();
 
             if(res.ok){
                 //add newly fetched posts inside userPosts state
-                setUserPosts((prev)=>([...prev, ...data.fetchedPosts]));
-                if(data.fetchedPosts.length < 9){
+                setUsers((prev)=>([...prev, ...data.fetchedUsers]));
+                if(data.fetchedUsers.length < 9){
                     setShowMore(false);
                 }
             }else{
-                toast.error('Error fetching more posts!')
-                console.error('Error from server at handleShowMore function at DashboardPosts.jsx: ', data.message);
+                toast.error('Error fetching more users!')
+                console.error('Error from server at handleShowMore function at DashboardUsers.jsx: ', data.message);
             }
         } catch (error) {
-            toast.error('Error fetching more posts!');
+            toast.error('Error fetching more users!');
             console.log('Error at handleShowMore function for show more button: ', error)
         }
     }
 
-    const handlePostDelete = async()=>{
+    const handleUserDelete = async()=>{
         setOpenModal(false);
         try {
-            const res = await fetch(`/api/post/delete/${postIdToDelete}/${currentUser._id}`, {
+            const res = await fetch(`/api/user/delete/${userIdToDelete}/${currentUser._id}`, {
                 method: 'DELETE'
             })
 
@@ -81,73 +82,71 @@ export default function DashboardPosts() {
 
             if(res.ok){
                 //remove the post from the screen as well
-                setUserPosts((prev)=>
-                    prev.filter((post)=>(post._id !== postIdToDelete))
+                setUsers((prev)=>
+                    prev.filter((post)=>(post._id !== userIdToDelete))
                 );
-                toast.success('Post deleted successfully!');
+                toast.success('User deleted successfully!');
             }else{
-                toast.error('Error deleting post1!');
-                console.error('Error from server for deleting post at handlePostDelete function inside DashboardPosts.jsx: ', data.message)
+                toast.error('Error deleting User!');
+                console.error('Error from server for deleting user at handleUserDelete function inside DashboardUsers.jsx: ', data.message)
             }
         } catch (error) {
-            toast.error('Error deleting post!');
-            console.error('Error deleting post at catch at handlePostDelete function at DashboardPosts.jsx: ', error)
+            toast.error('Error deleting user!');
+            console.error('Error deleting user at catch at handlePostDelete function at DashboardUsers.jsx: ', error)
         }
     }
   return (
     <div className="table-auto overflow-x-auto md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 scrollbar-thumb-slate-500">
-      {currentUser.isAdmin && userPosts.length > 0 ? 
+      {currentUser.isAdmin && users.length > 0 ? 
       (<>
         <Table>
             <TableHead>
                 <TableHeadCell>
-                    Date updated
+                    Date Created
                 </TableHeadCell>
                 <TableHeadCell>
                     Image
                 </TableHeadCell>
                 <TableHeadCell>
-                    Title
+                    Name
                 </TableHeadCell>
                 <TableHeadCell>
-                    Category
+                    Email
+                </TableHeadCell>
+                <TableHeadCell>
+                    Admin
                 </TableHeadCell>
                 <TableHeadCell>
                     Delete
                 </TableHeadCell>
-                <TableHeadCell>
-                    <span>Edit</span>
-                </TableHeadCell>
             </TableHead>
-            {userPosts.map((post)=>(
-                <TableBody className="divide-y" key={post._id}>
+            {users.map((user)=>(
+                <TableBody className="divide-y" key={user._id}>
                     <TableRow className="bg-white dark:border-gray-700 dark:bg-gray-800">
                         <TableCell>
-                            {format(post.updatedAt, "MM/dd/yyyy")}
+                            {format(user.createdAt, "MM/dd/yyyy")}
                         </TableCell>
                         <TableCell>
-                            <Link to={`/post/${post.slug}`} >
-                                <img src={post.image} className="w-20 h-10 object-cover bg-gray-500" />
+                            <img src={user.profilePicture} className="w-10 h-10 object-cover rounded-full bg-gray-500" />
+                        </TableCell>
+                        <TableCell>
+                            <Link className="font-medium text-gray-900 dark:text-white" >
+                                {user.name}
                             </Link>
                         </TableCell>
                         <TableCell>
-                            <Link className="font-medium text-gray-900 dark:text-white" to={`/post/${post.slug}`}>
-                                {post.title}
+                            <Link className="font-medium text-gray-900 dark:text-white" >
+                                {user.email}
                             </Link>
                         </TableCell>
                         <TableCell>
-                            {post.category}
+                            {user.isAdmin ? <FaCheck className="text-green-500"/> : <FaTimes className="text-red-500"/>}
                         </TableCell>
                         <TableCell>
                             <span onClick={()=>{
                                 setOpenModal(true);
-                                setPostIdToDelete(post._id);
+                                setUserIdToDelete(user._id);
                             }} className="text-red-500 font-medium hover:underline cursor-pointer">Delete</span>
-                        </TableCell>
-                        <TableCell>
-                            <Link to={`/update-post/${post._id}`}>
-                                <span className="text-teal-500 hover:underline cursor-pointer">Edit</span>
-                            </Link>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -160,7 +159,7 @@ export default function DashboardPosts() {
         )}
       </>)
       : 
-      (<p>No posts</p>)}
+      (<p>No Users!</p>)}
       <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
         <ModalHeader />
         <ModalBody>
@@ -170,7 +169,7 @@ export default function DashboardPosts() {
               Are you sure you want to delete this post?
             </h3>
             <div className="flex justify-center gap-4">
-              <Button color="red" onClick={() => handlePostDelete()}>
+              <Button color="red" onClick={() => handleUserDelete()}>
                 Yes, I'm sure
               </Button>
               <Button color="alternative" onClick={() => setOpenModal(false)}>

@@ -4,6 +4,7 @@ import {useLocation} from 'react-router-dom'
 import DashboardProfile from "../components/DashboardProfile";
 import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardPosts from "../components/DashboardPosts";
+import DashboardUsers from "../components/DashboardUsers";
 
 export default function Dashboard() {
   const [tab, setTab] = useState(''); {/* to keep track of value of tab in the url: /dashboard?tab=profile etc.*/}
@@ -37,6 +38,7 @@ export default function Dashboard() {
         {/* Profile */}
         {tab === 'profile' && <DashboardProfile />}
         {tab === 'posts' && <DashboardPosts />}
+        {tab === 'users' && <DashboardUsers />}
       </div>
     </div>
   )
