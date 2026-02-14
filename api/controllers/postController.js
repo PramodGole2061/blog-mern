@@ -16,6 +16,16 @@ export const create = async (req, res, next)=>{
     //split with space, join with '-' and replace any char that is not alphanumerical with '-'
     const slug = req.body.title.split(' ').join('-').toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
 
+    const duplicatePost = await Post.findOne({slug: slug});
+    if(duplicatePost){
+        return next(errorHandler(400, 'This post title already exists!'));
+    }
+
+    const duplicateTitle = await Post.findOne({title: req.body.title});
+    if(duplicateTitle){
+        return next(errorHandler(400, 'This title already exists!'));
+    }
+
     const createdPost = new Post({
         ...req.body,
         slug,
@@ -48,7 +58,7 @@ export const fetch = async(req, res, next)=>{
             ...(req.query.userId && {userId: req.query.userId}),
             //is category explicitely mentioned in the query
             ...(req.query.category && {category: req.query.category}),
-            ...(req.query.slug && {category: req.query.slug}),
+            ...(req.query.slug && {slug: req.query.slug}),
             ...(req.query.postId && {_id: req.query.postId}),
             //if searchTerm is in the query for searching
             ...(req.query.searchTerm && {
@@ -102,25 +112,32 @@ export const deletePost = async (req, res, next)=>{
 }
 
 export const updatePost = async (req, res, next)=>{
-    if(!req.userData.isAdmin || req.userData.id !== req.params.userId){
+    if(!req.userData.isAdmin && req.userData.id !== req.params.userId){
         return next(errorHandler(403, 'You are not authorized to update this post!'));
     }
     try {
+        // Generate a new slug if the title is being updated
+        let slug;
+        if (req.body.title) {
+            slug = req.body.title.split(' ').join('-').toLowerCase().replace(/[^a-zA-Z0-9]/g, '-');
+        }
+
         const updatedPost =  await Post.findByIdAndUpdate(req.params.postId, {
             $set: {
                 title: req.body.title,
                 content: req.body.content,
                 image: req.body.image,
-                category: req.body.category
+                category: req.body.category,
+                ...(slug && { slug }) 
             }
         }, {new: true});
 
         if(updatedPost){
             res.status(200).json(updatedPost);
         }else{
-            return next(errorHandler(400, 'Error updating the post!'));
+            return next(errorHandler(400, 'Post not found!'));
         }
     } catch (error) {
-        return next(errorHandler(400, 'Error updating the post!'));
+        return next(error);
     }
 }

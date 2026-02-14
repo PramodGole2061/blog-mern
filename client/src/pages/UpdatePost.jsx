@@ -28,7 +28,7 @@ export default function UpdatePost() {
             if(res.ok){
                 setFormData(data.fetchedPosts[0]);
             }else{
-                toast.error("Internal server error!");
+                toast.error(data.message);
                 console.log('Error from server while fetching a post for update: ', data.message)
             }
         }
@@ -95,17 +95,11 @@ export default function UpdatePost() {
   const handleSubmit = async (e)=>{
     e.preventDefault();
 
-    if(Object.keys(formData).length === 0 || formData.title.trim() === '' || formData.content.trim() === ''){
-      setPublishError('Title and content field can not be empty!');
-      toast.error('Title and content field can not be empty!')
-      return;
-    }
-
     try {
-      const res = await fetch(`/api/post/update/${formData._id}/${currentUser._id}`,{
+      const res = await fetch(`/api/post/update/${postId}/${currentUser._id}`,{
         method: 'PUT',
         headers: {
-          'content-type': 'application/json'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       })
@@ -117,13 +111,11 @@ export default function UpdatePost() {
         navigate(`/posts/${data.slug}`)
       }else{
         console.error("Server sent an error in a response while updating a post: ", data.message);
-        setPublishError('Internal server error!');
-        toast.error('Internal server error!')
+        setPublishError(data.message);
       }
     } catch (error) {
       console.error("Error submitting update post form in CreatePost.jsx: ", error)
-      setPublishError('Error updating the post!');
-      toast.error('Error updating the post!')
+      setPublishError('Something went wrong!');
     }
   }
   return (
@@ -133,7 +125,7 @@ export default function UpdatePost() {
         <div className='flex flex-col gap-4 sm:flex-row justify-between'>
             <TextInput type='text' id='title' onChange={handleChange} value={formData.title} className='flex-1' placeholder='Title' required />
             <Select id='category' onChange={handleChange} value={formData.category} >
-                <option value='Select a category'>Select a Category</option>
+                <option value=''>Select a Category</option>
                 <option value='javascript'>Javascript</option>
                 <option value='reactjs'>React.js</option>
                 <option value='nextjs'>Next.js</option>

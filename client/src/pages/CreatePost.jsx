@@ -63,6 +63,15 @@ export default function CreatePost() {
   const handleSubmit = async (e)=>{
     e.preventDefault();
 
+    const title = formData.title || "";
+    const content = formData.content || "";
+
+    if (!title.trim() || !content.trim()) {
+      setPublishError('Title and content fields cannot be empty!');
+      toast.error('Title and content fields cannot be empty!');
+      return;
+    }
+
     if(Object.keys(formData).length === 0 || formData.title.trim() === '' || formData.content.trim() === ''){
       setPublishError('Title and content field can not be empty!');
       toast.error('Title and content field can not be empty!')
@@ -85,13 +94,13 @@ export default function CreatePost() {
         navigate(`/posts/${data.slug}`)
       }else{
         console.error("Server sent an error in a response while creating a post: ", data.message);
-        setPublishError('Internal server error!');
-        toast.error('Internal server error!')
+        // setPublishError(data.message);
+        toast.error(data.message)
       }
     } catch (error) {
       console.error("Error submitting create post form in CreatePost.jsx: ", error)
-      setPublishError('Error saving the post!');
-      toast.error('Error saving the post!')
+      // setPublishError(error);
+      toast.error(error)
     }
   }
   return (

@@ -3,6 +3,7 @@
 @source "../.flowbite-react/class-list.json";
 @custom-variant dark (&:where(.dark, .dark *));
 @plugin 'tailwind-scrollbar';
+@plugin "@tailwindcss/typography";
 @plugin "daisyui";
 @plugin "daisyui" {
   themes: light, dark, cupcake, business, forest;
@@ -14,4 +15,33 @@ body{
 
 .ql-toolbar{
   font-size: 1.05rem;
+}
+
+/* to hide overflow of content in x direciton */
+.post-content {
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  /* This is the line for the hyphenation issue */
+  hyphens: auto; 
+}
+
+/* Light Mode */
+.post-content {
+  color: #1f2937 !important; /* Tailwind gray-800 */
+}
+
+/* Dark Mode */
+.dark .post-content {
+  color: #e5e7eb !important; /* Tailwind gray-200 */
+}
+
+/* This ensures that any spans or paragraphs inside the HTML also reset */
+.post-content * {
+  color: inherit !important;
+}
+
+/* Keep links blue */
+.post-content a {
+  color: #3b82f6 !important; 
 }

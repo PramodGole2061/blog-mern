@@ -124,7 +124,7 @@ export default function DashboardUsers() {
                 <TableBody className="divide-y" key={user._id}>
                     <TableRow className="bg-white dark:border-gray-700 dark:bg-gray-800">
                         <TableCell>
-                            {format(user.createdAt, "MM/dd/yyyy")}
+                            {format(user.createdAt, "yyyy/MM/dd")}
                         </TableCell>
                         <TableCell>
                             <img src={user.profilePicture} className="w-10 h-10 object-cover rounded-full bg-gray-500" />

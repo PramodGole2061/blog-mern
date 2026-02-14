@@ -123,7 +123,7 @@ export default function DashboardPosts() {
                 <TableBody className="divide-y" key={post._id}>
                     <TableRow className="bg-white dark:border-gray-700 dark:bg-gray-800">
                         <TableCell>
-                            {format(post.updatedAt, "MM/dd/yyyy")}
+                            {format(post.updatedAt, "yyyy/MM/dd")}
                         </TableCell>
                         <TableCell>
                             <Link to={`/post/${post.slug}`} >
