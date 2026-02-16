@@ -156,3 +156,18 @@ export const fetchUsers = async(req, res, next)=>{
         //next(error)
     }
 }
+
+export const getUser = async (req, res, next)=>{
+    try {
+        const userInfo = await User.findById({_id: req.params.userId});
+        const {password, ...restOfCredentials} = userInfo._doc;
+        if(userInfo){
+            res.status(200).json(restOfCredentials);
+        }else{
+            next(errorHandler(500, 'Internal server error!'));
+        }
+    } catch (error) {
+        next(errorHandler(400, 'Error fetching user info of a comment!'));
+        console.error('Error fetching a user info of a comment at getUser() at userController.js: ', error.message);
+    }
+}

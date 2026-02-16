@@ -1,14 +1,66 @@
 import { Button, Textarea } from 'flowbite-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {useSelector} from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {toast} from 'react-hot-toast'
+
+import Comment from './Comment';
 
 export default function CommentSection({postId}) {
   const {currentUser} = useSelector((state)=>(state.user));
+  const navigate = useNavigate();
 
   const [comment, setComment] = useState('');
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
+  console.log(comments);
+
+  useEffect(()=>{
+    const fetchComments = async ()=>{
+      try {
+        const res = await fetch(`/api/comment/fetch/${postId}`);
+        const data = await res.json();
+
+        if(res.ok){
+          // for auto update on comment section
+          setComments('');
+          setComments(...comments, data);
+        }
+      } catch (error) {
+        console.error('Error fetching comments at CommentSection.jsx: ', error);
+      }
+    }
+
+    fetchComments();
+  }, [postId])
+
+  const handleLikes = async (commentId)=>{
+    if(!currentUser){
+      return navigate('/signin');
+    }
+
+    try {
+      const res = await fetch(`/api/comment/like/${commentId}`, {
+        method: 'PUT'
+      })
+
+      const data = await res.json();
+
+      if(res.ok){
+        //go through all the comments
+        setComments((prev)=>prev.map((comment)=>
+        comment._id === commentId ? {
+          ...comment, likes: data.likes, numberOfLikes: data.numberOfLikes
+        } : comment
+        ))
+      }else{
+        console.error('Error at handleLikes() at CommentSection.jsx: ', data.message);
+      }
+        
+    } catch (error) {
+      console.error('Error at handleLikes() at CommentSection.jsx: ', error);
+    }
+  }
 
   const handleSubmit = async (e)=>{
     e.preventDefault();
@@ -42,9 +94,9 @@ export default function CommentSection({postId}) {
     }
   }
 
-  // console.log({postId})
   return (
     <div className='w-full max-w-2xl mx-auto p-3'>
+      {/* create comment section */}
       {currentUser ? (
         <div className='flex gap-1 items-center my-5 text-sm text-gray-500'>
             <p>Signed in as: </p>
@@ -69,6 +121,21 @@ export default function CommentSection({postId}) {
           </div>
         </form>
       )}
+
+      {/* Show comments */}
+      {comments.length === 0 ? (
+        <div className='border border-gray-300 rounded-sm my-5 p-3 items-center'>
+          <p className='text-sm text-gray-500'>No comments yet.</p>
+        </div>) : 
+        (<div className='border border-gray-300 rounded-sm my-5 p-3 items-center'>
+          <div className='flex gap-1'>
+            <p className='text-xm text-gray-500'>Comments</p>
+            <div className='border border-gray-400 py-1 px-2 rounded-sm'><p>{comments.length}</p></div>
+          </div>
+          {comments.map((comment)=>(
+            <Comment key={comment._id} comment = {comment} handleLikes={handleLikes} />
+          ))}
+        </div>)}
     </div>
   )
 }
