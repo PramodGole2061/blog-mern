@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
 import {Button, Spinner} from 'flowbite-react'
 import { format } from "date-fns";
+import CommentSection from "../components/CommentSection";
 
 export default function PostPage() {
     const {postSlug} = useParams(); //<Route path="/post/:postSlug" element={<PostPage />} /> from App.jsx
@@ -36,7 +37,7 @@ export default function PostPage() {
         fetchPost();
     }, [postSlug])
 
-    console.log({loading});
+    // console.log({loading});
 
     
     // {loading && (<div>Loading...</div>)} it won't work here
@@ -63,6 +64,8 @@ export default function PostPage() {
       <div className="w-full max-w-2xl p-2 mx-auto post-content prose dark:prose-invert lg:prose-xl" dangerouslySetInnerHTML={{__html: post && post.content}}>
 
       </div>
+
+      <CommentSection postId = {post && post._id} />
     </main>
   )
 }

@@ -9,6 +9,7 @@ import dbConnection from './config/dbConnection.js';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js'
 import postRoutes from './routes/postRoutes.js'
+import commentRoutes from './routes/commentRoutes.js'
 
 //this will make dotenv.config() to be global on all files
 dotenv.config();
@@ -35,9 +36,11 @@ app.use(express.json());
 //user routes
 app.use('/api/user', userRoutes);
 //auth routes
-app.use('/api/auth', authRoutes)
+app.use('/api/auth', authRoutes);
 //post routes
-app.use('/api/post', postRoutes)
+app.use('/api/post', postRoutes);
+//comment routes
+app.use('/api/comment', commentRoutes);
 
 //middleware for handling errors
 app.use((error, req, res, next) =>{
