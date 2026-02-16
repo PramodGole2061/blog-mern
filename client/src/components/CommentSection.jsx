@@ -94,6 +94,11 @@ export default function CommentSection({postId}) {
     }
   }
 
+  const handleEditedComment = (comment, editedComment)=>{
+    setComments((prev)=>
+    prev.map((comm)=> comm._id === comment._id ? {...comm, content: editedComment} : comm
+    ))
+  }
   return (
     <div className='w-full max-w-2xl mx-auto p-3'>
       {/* create comment section */}
@@ -133,7 +138,7 @@ export default function CommentSection({postId}) {
             <div className='border border-gray-400 py-1 px-2 rounded-sm'><p>{comments.length}</p></div>
           </div>
           {comments.map((comment)=>(
-            <Comment key={comment._id} comment = {comment} handleLikes={handleLikes} />
+            <Comment key={comment._id} comment = {comment} handleLikes={handleLikes} onEdit = {handleEditedComment} />
           ))}
         </div>)}
     </div>

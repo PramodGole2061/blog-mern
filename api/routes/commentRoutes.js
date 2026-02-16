@@ -1,7 +1,7 @@
 import express from 'express';
 
 import {verifyUser} from '../utils/verifyUser.js'
-import {createComment, fetchComments, handleLike} from '../controllers/commentController.js'
+import {createComment, fetchComments, handleLike, handleEdit} from '../controllers/commentController.js'
 
 const router = express.Router();
 
@@ -13,5 +13,8 @@ router.get('/fetch/:postId', fetchComments)
 
 //for likes functionality
 router.put('/like/:commentId', verifyUser, handleLike)
+
+//for edit functionality
+router.put('/edit/:commentId', verifyUser, handleEdit)
 
 export default router;

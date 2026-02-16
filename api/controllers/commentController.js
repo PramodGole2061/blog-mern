@@ -68,3 +68,30 @@ export const handleLike = async (req, res, next)=>{
         console.error('Error saving like on a comment: ',error)
     }
 }
+
+export const handleEdit = async (req, res, next)=>{
+    try {
+        const comment = await Comment.findById({_id: req.params.commentId});
+        if(!comment){
+            return next(errorHandler(404, 'Comment not found!'));
+        }else{
+            if(comment.userId !== req.userData.userId && !req.userData.isAdmin){
+                return next(errorHandler(403, 'You are not authorized to edit this comment!'))
+            }
+
+            const editedComment = await Comment.findByIdAndUpdate({_id: req.params.commentId}, {
+                content: req.body.content
+            }, {new: true})
+
+            if(editedComment){
+                res.status(200).json(editedComment);
+            }else{
+                next(errorHandler(500, 'Internal server error!'));
+                console.error('Error returned from database while saving edited comment: ', editedComment.message);
+            }
+        }
+    } catch (error) {
+        next(errorHandler(400, 'Error saving the comment!'));
+        console.error('Error saving an edited comment at handleEdit() at commentController.jsx: ', error)
+    }
+}
