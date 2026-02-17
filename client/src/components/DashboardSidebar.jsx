@@ -5,6 +5,8 @@ import { href, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FaComment } from "react-icons/fa";
 import { IoIosPaper } from "react-icons/io";
+import { MdDashboard } from "react-icons/md";
+
 
 
 import { signoutFailure, signoutSuccess } from "../redux/user/userSlice";
@@ -52,6 +54,11 @@ export default function DashboardSidebar() {
     <Sidebar className="w-full md:w-56">
       <SidebarItems>
         <SidebarItemGroup>
+          {currentUser && (
+            <SidebarItem active={tab === 'dashboard' || !tab} href="/dashboard?tab=dashboard" icon={MdDashboard}>
+              Dashboard
+            </SidebarItem>
+          )}
           <SidebarItem active={tab==='profile'} href="/dashboard?tab=profile" icon={HiUser} label="user" labelColor="dark">
             Profile
           </SidebarItem>
