@@ -51,7 +51,7 @@ export const fetch = async(req, res, next)=>{
         //eg: /api/post/fetch?limit=3, then only 3 will be fetched. if not explicitely mentioned only 9 will fetched
         const limit = parseInt(req.query.limit) || 9;
         //if order=asc, fetch in ascending order (1) otherwise in descending order(-1)
-        const sortDirection = req.query.order === 'asc' ? 1 : -1;
+        const sortDirection = req.query.order === 'asc' ? 1 : -1; //unless explicitely written in query it will be descending
 
         const fetchedPosts = await Post.find({ //fetch with conditions, based on the query
             //if query has userId, set userId to req.query.userId and fetch from that specific userId(which is set on /create)

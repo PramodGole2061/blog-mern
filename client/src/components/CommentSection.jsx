@@ -13,7 +13,7 @@ export default function CommentSection({postId}) {
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
-  console.log(comments);
+  // console.log(comments);
 
   useEffect(()=>{
     const fetchComments = async ()=>{
@@ -99,6 +99,12 @@ export default function CommentSection({postId}) {
     prev.map((comm)=> comm._id === comment._id ? {...comm, content: editedComment} : comm
     ))
   }
+
+  const removeDeletedComment = (comment)=>{
+    setComments((prev)=>
+    prev.filter((comm)=>comm._id !== comment._id)
+    )
+  }
   return (
     <div className='w-full max-w-2xl mx-auto p-3'>
       {/* create comment section */}
@@ -138,7 +144,7 @@ export default function CommentSection({postId}) {
             <div className='border border-gray-400 py-1 px-2 rounded-sm'><p>{comments.length}</p></div>
           </div>
           {comments.map((comment)=>(
-            <Comment key={comment._id} comment = {comment} handleLikes={handleLikes} onEdit = {handleEditedComment} />
+            <Comment key={comment._id} comment = {comment} handleLikes={handleLikes} onEdit = {handleEditedComment} onDelete = {removeDeletedComment} />
           ))}
         </div>)}
     </div>

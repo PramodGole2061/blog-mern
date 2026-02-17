@@ -3,7 +3,9 @@ import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
 import {Button, Spinner} from 'flowbite-react'
 import { format } from "date-fns";
+
 import CommentSection from "../components/CommentSection";
+import PostCard from "../components/PostCard";
 
 export default function PostPage() {
     const {postSlug} = useParams(); //<Route path="/post/:postSlug" element={<PostPage />} /> from App.jsx
@@ -11,7 +13,8 @@ export default function PostPage() {
     const [post, setPost] = useState(null); //null for object and [] for arrays
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const [recentPosts, setRecentPosts] = useState([]);
+    console.log({recentPosts});
     useEffect(()=>{
         const fetchPost = async ()=>{
             setLoading(true);
@@ -37,7 +40,22 @@ export default function PostPage() {
         fetchPost();
     }, [postSlug])
 
-    // console.log({loading});
+    useEffect(()=>{
+        const fetchRecentPosts = async ()=>{
+            try {
+                const res = await fetch(`/api/post/fetch?limit=3`);
+                const data = await res.json();
+                if(res.ok){
+                    setRecentPosts(data.fetchedPosts);
+                }
+            } catch (error) {
+                console.log('error fetching recent articles at PostPage.jsx: ', error.message);
+                toast.error('Could not fetch recent posts!');
+            }
+        }
+
+        fetchRecentPosts();
+    }, [])// run just once
 
     
     // {loading && (<div>Loading...</div>)} it won't work here
@@ -66,6 +84,14 @@ export default function PostPage() {
       </div>
 
       <CommentSection postId = {post && post._id} />
+      <div className="mb-5 flex flex-col justify-center items-center">
+        <h1 className="text-xl">Recent Articles</h1>
+        <div className="flex flex-wrap gap-2 justify-center mt-5">
+            {recentPosts && recentPosts.map((post)=>
+            <PostCard key={post._id} post={post} />
+            )}
+        </div>
+      </div>
     </main>
   )
 }

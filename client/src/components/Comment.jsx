@@ -2,15 +2,19 @@ import { useEffect, useState } from "react"
 import {formatDistanceToNow} from 'date-fns';
 import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { Textarea, Button } from "flowbite-react";
+import { Textarea, Button, Modal, ModalBody, ModalHeader } from "flowbite-react";
 import {toast} from 'react-hot-toast'
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 
-export default function Comment({comment, handleLikes, onEdit}) {
-    const [userInfo, setUserInfo] = useState({});
+export default function Comment({comment, handleLikes, onEdit, onDelete}) {
     const {currentUser} = useSelector((state)=>(state.user));
-
+    const navigate = useNavigate();
+    
+    const [userInfo, setUserInfo] = useState({});
     const [isEditing, setIsEditing] = useState(false);
     const [editedComment, setEditedComment] = useState(comment.content);
+    const [openModal, setOpenModal] = useState(false);
 
     // to get user info
     useEffect(()=>{
@@ -63,6 +67,30 @@ export default function Comment({comment, handleLikes, onEdit}) {
         }
     }
 
+    const handleDelete = async()=>{
+        setOpenModal(false);
+
+        if(!currentUser){
+            return navigate('/signin')
+        }
+        try {
+            const res = await fetch(`/api/comment/delete/${comment._id}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+            if(res.ok){
+                toast.success('Deleted comment successfully!');
+                onDelete(comment);
+            }else{
+                toast.error('Could not delete the comment!');
+                console.error('Error deleting a comment at handleDelete() at Comment.jsx: ', data.message);
+            }
+        } catch (error) {
+            toast.error('Could not delete the comment!');
+            console.error('Error deleting a comment at handleDelete() at Comment.jsx: ', error);
+        }
+    }
+
   return (
     <div className="border-b items-center p-4 mb-2 ">
     <div className="flex gap-1">
@@ -103,9 +131,29 @@ export default function Comment({comment, handleLikes, onEdit}) {
             {currentUser && (currentUser._id === comment.userId || currentUser.isAdmin) && (
                 <button onClick={()=>handleCommentEdit()} className="text-xs text-gray-400 hover:text-blue-500 hover:cursor-pointer">Edit</button>
             )}
+            {currentUser && (currentUser._id === comment.userId) && (<button type="button" onClick={()=>setOpenModal(true)} className="text-xs text-gray-400 hover:cursor-pointer hover:text-red-500">Delete</button>)}
         </div>
         </>
     )}
+    <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+        <ModalHeader />
+        <ModalBody>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete this product?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="red" onClick={() => handleDelete()}>
+                Yes, I'm sure
+              </Button>
+              <Button color="alternative" onClick={() => setOpenModal(false)}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </ModalBody>
+      </Modal>
     </div>
   )
 }

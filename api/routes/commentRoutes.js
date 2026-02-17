@@ -1,7 +1,7 @@
 import express from 'express';
 
 import {verifyUser} from '../utils/verifyUser.js'
-import {createComment, fetchComments, handleLike, handleEdit} from '../controllers/commentController.js'
+import {createComment, fetchComments, handleLike, handleEdit, deleteComment} from '../controllers/commentController.js'
 
 const router = express.Router();
 
@@ -16,5 +16,8 @@ router.put('/like/:commentId', verifyUser, handleLike)
 
 //for edit functionality
 router.put('/edit/:commentId', verifyUser, handleEdit)
+
+// for deleting
+router.delete('/delete/:commentId', verifyUser, deleteComment)
 
 export default router;

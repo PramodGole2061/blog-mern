@@ -95,3 +95,27 @@ export const handleEdit = async (req, res, next)=>{
         console.error('Error saving an edited comment at handleEdit() at commentController.jsx: ', error)
     }
 }
+
+export const deleteComment = async (req, res, next)=>{
+    
+    try {
+        const comment = await Comment.findOne({_id: req.params.commentId});
+        if(!comment){
+            return next(errorHandler(404, 'Comment not found!'));
+        }
+
+        if(req.userData.id !== comment.userId && !req.userData.isAdmin){
+            return next(errorHandler(403, 'You are not authorized to delete this comment!'));
+        }
+
+        const deletedComment = await Comment.findByIdAndDelete({_id: req.params.commentId});
+        if(!deletedComment){
+            return next(errorHandler(500, 'Internal server error!'));
+        }
+
+        res.status(200).json(deletedComment);
+    } catch (error) {
+        next(errorHandler(400, 'Error deleting the comment!'));
+        console.error('Error deleting a comment at deleteComment() at commentController.js: ', error.message);
+    }
+}
