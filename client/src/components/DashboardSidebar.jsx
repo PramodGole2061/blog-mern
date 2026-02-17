@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { HiArrowSmLeft, HiArrowSmRight, HiChartPie, HiInbox, HiPaperClip, HiShoppingBag, HiTable, HiUser, HiUserGroup } from "react-icons/hi";
 import { href, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { FaComment } from "react-icons/fa";
+import { IoIosPaper } from "react-icons/io";
+
 
 import { signoutFailure, signoutSuccess } from "../redux/user/userSlice";
 
@@ -52,13 +55,18 @@ export default function DashboardSidebar() {
           <SidebarItem active={tab==='profile'} href="/dashboard?tab=profile" icon={HiUser} label="user" labelColor="dark">
             Profile
           </SidebarItem>
-          {currentUser.isAdmin && (<SidebarItem active={tab === 'posts'} href="/dashboard?tab=posts" icon={HiPaperClip} >
+          {currentUser.isAdmin && (<SidebarItem active={tab === 'posts'} href="/dashboard?tab=posts" icon={IoIosPaper} >
             Posts
           </SidebarItem>
           )}
           {currentUser.isAdmin && (<SidebarItem active={tab === 'users'} href="/dashboard?tab=users" icon={HiUserGroup} >
             Users
           </SidebarItem>
+          )}
+          {currentUser.isAdmin && (
+            <SidebarItem active={tab === 'comments'} href="/dashboard?tab=comments" icon={FaComment}>
+              Comments
+            </SidebarItem>
           )}
           <SidebarItem onClick={()=>(handleSignOut())} icon={HiArrowSmLeft}>
             Sign Out

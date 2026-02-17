@@ -5,6 +5,7 @@ import DashboardProfile from "../components/DashboardProfile";
 import DashboardSidebar from "../components/DashboardSidebar";
 import DashboardPosts from "../components/DashboardPosts";
 import DashboardUsers from "../components/DashboardUsers";
+import DashboardComments from "../components/DashboardComments";
 
 export default function Dashboard() {
   const [tab, setTab] = useState(''); {/* to keep track of value of tab in the url: /dashboard?tab=profile etc.*/}
@@ -39,6 +40,7 @@ export default function Dashboard() {
         {tab === 'profile' && <DashboardProfile />}
         {tab === 'posts' && <DashboardPosts />}
         {tab === 'users' && <DashboardUsers />}
+        {tab === 'comments' && <DashboardComments />}
       </div>
     </div>
   )

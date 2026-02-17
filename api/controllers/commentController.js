@@ -119,3 +119,33 @@ export const deleteComment = async (req, res, next)=>{
         console.error('Error deleting a comment at deleteComment() at commentController.js: ', error.message);
     }
 }
+
+export const getComments = async(req, res, next)=>{
+    if(!req.userData.isAdmin){
+        return next(errorHandler(403, 'You are not authorized!'));
+    }
+    try {
+        const startIndex = parseInt(req.query.startIndex) || 0;
+        const limit = parseInt(req.query.limit) || 9;
+        const sortDirection = req.query.sortDirection === 'acs' ? 1 : -1;
+
+        const comments = await Comment.find().sort({createdAt: sortDirection}).skip(startIndex).limit(limit);
+
+        const totalComments = await Comment.countDocuments();
+
+        const now = new Date();
+        const oneMonthAgo = new Date(
+            now.getFullYear(),
+            now.getMonth() -1,
+            now.getDate()
+        )
+
+        const commentsOneMonthAgo = await Comment.find({
+            createdAt: {$gte: oneMonthAgo}
+        }).countDocuments();
+
+        res.status(200).json({comments, totalComments, commentsOneMonthAgo});
+    } catch (error) {
+        next(errorHandler(400, 'Error fetching comments!'));
+    }
+}
