@@ -5,7 +5,7 @@ import PostCard from '../components/PostCard'
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
-  console.log(posts);
+  
   useEffect(()=>{
     const fetchPosts = async()=>{
       try {
@@ -41,7 +41,9 @@ export default function Home() {
                 <PostCard key={post._id} post = {post} />
               ))}
             </div>
-            <p className='text-lg text-center text-teal-500 hover:underline hover:cursor-pointer'>View all posts</p>
+            <Link to={`/search`}>
+              <p className='text-lg text-center text-teal-500 hover:underline hover:cursor-pointer'>View all posts</p>
+            </Link>
           </div>
         )}
       </div>
