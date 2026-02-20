@@ -7,14 +7,14 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import {Link} from 'react-router-dom'
 
 export default function DashboardProfile() {
-    const {currentUser, error, loading} = useSelector((state)=>(state.user));
+    const {currentUser, loading} = useSelector((state)=>(state.user));
     const dispatch = useDispatch();
 
     const [imageFile, setImageFile] = useState(null);
     const [formData, setFormData] = useState({});
     const [openModal, setOpenModal] = useState(false);
     const [imageUploading, setImageUploading] = useState(false);
-
+    const [error, setError] = useState(null);
 
     const handleFormUpdate = (e) =>{
       setFormData({...formData, [e.target.id]: e.target.value.trim()});
@@ -32,7 +32,8 @@ export default function DashboardProfile() {
 
       //check if formData is empty
       if(Object.keys(formData).length === 0 || formData.password === '' || formData.email === '' || formData.name === ''){
-        return dispatch(updateFailure('Empty field can not updated!'));
+        dispatch(updateFailure(''));
+        return setError('Empty field can not updated!');
       }
 
       try {
@@ -52,11 +53,15 @@ export default function DashboardProfile() {
           dispatch(updateSuccess(data));
           toast.success('Updated successfully!');
         }else{
-          dispatch(updateFailure(data.message));
+          dispatch(updateFailure(''));
+          setError('Internal Server Error!');
+          console.error('Server error while updating user at DashboardProfile.jsx: ', data.message);
         }
         
       } catch (error) {
-        dispatch(updateFailure(error));
+        dispatch(updateFailure(''));
+        setError('Could not update the user!');
+        console.error('Error while updating user at DashboardProfile.jsx: ', error.message);
       }
     }
 
@@ -119,7 +124,9 @@ export default function DashboardProfile() {
 
       } catch (error) {
         setImageUploading(false);
-        dispatch(updateFailure(error))
+        dispatch(updateFailure(''))
+        setError('Could not upload the image!');
+        console.error('Error uploading user image at uploadImage() at DashboardProfile.jsx: ', error.message);
         // console.log("Upload error: ", error)
       }finally{
         setImageUploading(false)

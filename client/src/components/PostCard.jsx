@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 export default function PostCard({post}) {
   return (
     // group 
-    <div className="p-3 group relative w-full border border-teal-500 hover:border-2 h-[400px] overflow-hidden rounded-lg sm:w-[360px] transition-all"> 
+    <div className="p-3 group relative w-full border border-teal-500 hover:border-2 h-[400px] overflow-hidden rounded-lg sm:w-[360px] transition-all mb-2"> 
       <Link to={`/post/${post.slug}`}>
         {/* group is used as group-hover:, it will make whole div have hover effect */}
         <img className="h-[260px] w-full object-cover group-hover:h-[200px] transition-all duration-300 z-20" src={post.image}  alt={post.title}/>
