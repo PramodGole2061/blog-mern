@@ -118,7 +118,6 @@ export default function Header() {
             {/* use the above urlPath to decide which NavbarLink to be active depending on the url path */}
             <NavbarLink to="/" active={urlPath === '/'} as={Link}>Home</NavbarLink>
             <NavbarLink to="/about" active={urlPath === '/about'} as={Link}>About</NavbarLink>
-            <NavbarLink to="/projects" active={urlPath==='/projects'} as={Link}>Projects</NavbarLink>
 
         </NavbarCollapse>
     </Navbar>
