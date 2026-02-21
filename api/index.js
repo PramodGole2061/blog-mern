@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 //Parse Cookie header and populate req.cookies
 import cookieParser from 'cookie-parser';
+import path from 'path';
 
 import dbConnection from './config/dbConnection.js';
 import userRoutes from './routes/userRoutes.js';
@@ -31,6 +32,8 @@ dbConnection().then(()=>{
     console.error("Failed to start server due to DB connection error", error);
 })
 
+const __dirname = path.resolve();
+
 //routes
 app.use(express.json());
 //user routes
@@ -41,6 +44,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/post', postRoutes);
 //comment routes
 app.use('/api/comment', commentRoutes);
+
+app.use(express.static(path.join(__dirname, '/client/dist')));
+
+app.get('*', (req, res)=>{
+    res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+})
 
 //middleware for handling errors
 app.use((error, req, res, next) =>{
