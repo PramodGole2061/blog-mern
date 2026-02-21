@@ -71,14 +71,17 @@ export default function Header() {
             </span>
             Blog
         </Link>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="flex gap-2">
             {/* for large screen make it appear inline for md and sm make it hidden */}
-            <TextInput type="text" value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} placeholder="Search" rightIcon={AiOutlineSearch} className="hidden lg:inline w-24 md:w-auto" />
+            <TextInput type="text" value={searchTerm} onChange={(e)=>setSearchTerm(e.target.value)} placeholder="Search" className="hidden lg:inline w-24 md:w-auto" />
+            <button className="text-2xl hover:cursor-pointer hover:text-teal-500 hidden lg:inline md:w-auto" type="submit" outline><AiOutlineSearch /></button>
         </form>
         {/* pill makes the button rounded */}
-        <Button className="lg:hidden w-12 h-10 " color='grey' pill> 
-            <AiOutlineSearch />
-        </Button>
+        <Link to='/search' >
+            <Button type="submit" outline className="lg:hidden w-12 h-10 hover:cursor-pointer" color='grey' pill> 
+                <AiOutlineSearch />
+            </Button>
+        </Link>
 
         {/* flex to put them horizontally, gap make a gap, in small scrrens show one */}
         <div className="flex gap-2 sm:order-2"> 
